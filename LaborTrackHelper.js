@@ -2,7 +2,7 @@
 // @name         Labor Track Helper
 // @namespace    https://aftlite-na.amazon.com/
 // @version      0.9
-// @description  Labor track users automaticlly with set interval, One click labor tracking.
+// @description  Labor track users automaticlly with set interval(Not yet implemented), one-click labor tracking, show lastest labor track time.
 // @author       whz1995
 // @match        https://aftlite-na.amazon.com/*
 // @match        http://aftlite-na.amazon.com/*
