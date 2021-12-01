@@ -6,6 +6,8 @@
 // @author       whz1995
 // @match        https://aftlite-na.amazon.com/*
 // @match        http://aftlite-na.amazon.com/*
+// @updateURL    https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.js
+// @updateURL    https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.js
 // @grant        none
 // ==/UserScript==
 
