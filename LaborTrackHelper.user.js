@@ -7,7 +7,7 @@
 // @match        https://aftlite-na.amazon.com/indirect_action/signin_indirect_action*
 // @match        http://aftlite-na.amazon.com/indirect_action/signin_indirect_action*
 // @updateURL    https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.user.js
-// @downloadURL   https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.user.js
+// @downloadURL  https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.user.js
 // @grant        none
 // ==/UserScript==
 
