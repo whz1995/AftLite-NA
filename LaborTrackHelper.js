@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Labor Track Helper
 // @namespace    https://aftlite-na.amazon.com/
-// @version      0.9
+// @version      1.0
 // @description  Labor track users automaticlly with set interval(Not yet implemented), one-click labor tracking, show lastest labor track time.
 // @author       whz1995
-// @match        https://aftlite-na.amazon.com/*
-// @match        http://aftlite-na.amazon.com/*
+// @match        https://aftlite-na.amazon.com/indirect_action/signin_indirect_action*
+// @match        http://aftlite-na.amazon.com/indirect_action/signin_indirect_action*
 // @updateURL    https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.js
 // @updateURL    https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.js
 // @grant        none
@@ -13,61 +13,164 @@
 
 (function() {
     let Action_Lock = false;
-    let Name = document.getElementsByName("name")[0];
-    let Code = document.getElementsByName("code")[0];
-    let Current_User = document.getElementsByClassName("wms-welcome")[0].innerText.split(" ")[2].replace(/[().]/g,"");
-    let LT_button = '';
-    let New_Line = document.createElement("br");
+    const Current_User = document.getElementsByClassName("wms-welcome")[0].innerText.split(" ")[2].replace(/[().]/g,"");
+    const Form = document.getElementsByTagName("form")[0];
     sessionStorage.AutoLaborTrackFlag;
+    sessionStorage.AutoLaborTrackCode;
+    let Labor_Track_Msg = document.getElementsByClassName("Positive")[0];
+    let Msg_Exist_Flag = false;
+    let Auto_LT_Timer;
 
-    let OB_button = document.createElement("button");
-    OB_button.innerHTML = "OBindirect";
-    OB_button.onclick = function(){
-        LaborTrack("OBindirect");
+    ShowTimes();
+    Form.append(document.createElement("br"));
+    Form.append(document.createElement("br"));
+    CreateLtButton("OBindirect");
+    CreateLtButton("ICQAindirect");
+    CreateLtButton("IBindirect");
+    CreateLtButton("SPECindirect");
+    CreateLtButton("BRK","#FFBC72");
+    CreateLtButton("EOS","#FA6158");
+    const Auto_LT_button = document.createElement("button");
+    Form.after(Auto_LT_button);
+    AutoLtInitialize();
+    Auto_LT_button.before(document.createElement("br"));
+    Auto_LT_button.addEventListener("click",AutoLtClick);
+
+
+    function LaborTrackMsgVerify(){
+        let LT_Msg_Verify = false;
+        let User_Verify = false;
+        let Last_LT_Code = "";
+        if(Labor_Track_Msg !== undefined && Labor_Track_Msg.innerText.split(" ")[4] == "logged"){
+            LT_Msg_Verify = true;
+            if(Labor_Track_Msg.innerText.split(" ")[1].replace(/[\[\]]/g,"") == Current_User){
+                User_Verify = true;
+                Last_LT_Code = Labor_Track_Msg.innerText.split(" ")[6].replace(/[\[\]]/g,"");
+            }
+        }
+        const LT_Info = [LT_Msg_Verify, User_Verify, Last_LT_Code];
+        return LT_Info;
     }
 
-    let IB_button = document.createElement("button");
-    IB_button.innerHTML = "IBindirect";
-    IB_button.onclick = function(){
-        LaborTrack("IBindirect");
+    function CreateLtButton(LT_Code,Color){
+        const New_button = document.createElement("button");
+        New_button.innerHTML = LT_Code;
+        if(Color != null){
+            New_button.setAttribute("style", "background-color:" + Color);
+        }
+        Form.append(New_button);
+        New_button.addEventListener("click",function(){LaborTrack(LT_Code)});
     }
 
-    let ICQA_button = document.createElement("button");
-    ICQA_button.innerHTML = "ICQAindirect";
-    ICQA_button.onclick = function(){
-        LaborTrack("ICQAindirect");
-    }
-
-    let SPEC_button = document.createElement("button");
-    SPEC_button.innerHTML = "SPECindirect";
-    SPEC_button.onclick = function(){
-        LaborTrack("SPECindirect");
-    }
-
-    let BRK_button = document.createElement("button");
-    BRK_button.innerHTML = "BRK";
-    BRK_button.setAttribute("style", "background-color:#FFBC72");
-    BRK_button.onclick = function(){
-        LaborTrack("BRK");
-    }
-
-    let EOS_button = document.createElement("button");
-    EOS_button.innerHTML = "EOS";
-    EOS_button.setAttribute("style", "background-color:#FA6158");
-    EOS_button.onclick = function(){
-        LaborTrack("EOS");
-    }
-
-    function ShowTimes(){
-        if(document.getElementsByClassName("Positive")[0] != undefined && document.getElementsByClassName("Positive")[0].innerText.split(" ")[4] == "logged"){
-            const date = new Date();
-            let Times = date.toTimeString().split(" ")[0];
-            let New_Message = document.getElementsByClassName("Positive")[0].innerText.replace(".","") + " at " + Times + ".";
-            document.getElementsByClassName("Positive")[0].innerText = New_Message;
+    function AutoLtInitialize(){
+        if(sessionStorage.AutoLaborTrackFlag == 1){
+            AutoLtButtonUpdate("Success");
+            AutoLtAction("Start",sessionStorage.AutoLaborTrackCode);
+        }
+        else{
+            AutoLtButtonUpdate("Off");
         }
     }
 
-    function LaborTrack(LT_button){
+    function AutoLtButtonUpdate(Status){
+        let Message = "";
+        let Color = "";
+        switch(Status){
+            case "Success":
+                Message = `User [${Current_User}] will be logged into [${LaborTrackMsgVerify()[2]}] every 5 minute.`;
+                Color = "green";
+                Auto_LT_button.innerHTML = "Auto Labor Track:ON";
+                Auto_LT_button.setAttribute("style", "background-color:green");
+                break
+            case "Fail_No_LT":
+                Message = `You need to labor track first!`;
+                Color = "orange";
+                Auto_LT_button.innerHTML = "Auto Labor Track:OFF";
+                Auto_LT_button.setAttribute("style", "background-color:red");
+                break;
+            case "Fail_Wrong_User":
+                Message = `Wrong user was labor tracked! You need to labor track yourself!`;
+                Color = "orange";
+                Auto_LT_button.innerHTML = "Auto Labor Track:OFF";
+                Auto_LT_button.setAttribute("style", "background-color:red");
+                break;
+            case "Off":
+                Message = `Auto labor track is off! Don't forget to labor track yourself!`;
+                Color = "red";
+                Auto_LT_button.innerHTML = "Auto Labor Track:OFF";
+                Auto_LT_button.setAttribute("style", "background-color:red");
+                break;
+            default:
+                break;
+        }
+        if(Message != ""){
+            if(!Msg_Exist_Flag){
+                Msg_Exist_Flag = true;
+                const Text = document.createElement("h2");
+                Text.setAttribute("class","Auto_LT_Msg")
+                Text.innerText = Message;
+                Text.setAttribute("style", "color:" + Color);
+                Auto_LT_button.after(Text);
+            }
+            else{
+                let Current_Msg = document.getElementsByClassName("Auto_LT_Msg")[0];
+                Current_Msg.innerText = Message;
+                Current_Msg.setAttribute("style", "color:" + Color);
+            }
+        }
+    }
+
+    function AutoLtClick(){
+        if(sessionStorage.AutoLaborTrackFlag == 1){
+            sessionStorage.AutoLaborTrackFlag = 0;
+            sessionStorage.AutoLaborTrackCode = "";
+            AutoLtButtonUpdate("Off");
+            AutoLtAction("Stop");
+        }
+        else{
+            if(LaborTrackMsgVerify()[1] == true){
+                sessionStorage.AutoLaborTrackFlag = 1;
+                sessionStorage.AutoLaborTrackCode = LaborTrackMsgVerify()[2];
+                AutoLtButtonUpdate("Success");
+                AutoLtAction("Start",LaborTrackMsgVerify()[2]);
+            }
+            else if(LaborTrackMsgVerify()[0] == false){
+                sessionStorage.AutoLaborTrackFlag = 0;
+                AutoLtButtonUpdate("Fail_No_LT");
+            }
+            else if(LaborTrackMsgVerify()[1] == false){
+                sessionStorage.AutoLaborTrackFlag = 0;
+                AutoLtButtonUpdate("Fail_Wrong_User");
+            }
+        }
+    }
+
+    function AutoLtAction(Action,Code){
+        switch(Action){
+            case "Start":
+                Auto_LT_Timer = setTimeout(function(){LaborTrack(Code,true)},3000);
+                break;
+            case "Stop":
+                clearTimeout(Auto_LT_Timer);
+                break;
+            default:
+                break;
+        }
+    }
+
+    function ShowTimes(){
+        if(LaborTrackMsgVerify()[0]){
+            const date = new Date();
+            const Times = date.toTimeString().split(" ")[0];
+            let New_Message = `${Labor_Track_Msg.innerText.replace(".","")} at ${Times}.`;
+            Labor_Track_Msg.innerText = New_Message;
+        }
+        return;
+    }
+
+    function LaborTrack(LT_button,isClick){
+        const Name = document.getElementsByName("name")[0];
+        const Code = document.getElementsByName("code")[0];
         if(!Action_Lock){
             Action_Lock = true;
             if(Name.value !== '') {
@@ -77,15 +180,11 @@
                 Code.value = LT_button;
             }
         }
+        if(isClick){
+            const Submit_Button = document.getElementsByName("commit")[0];
+            Submit_Button.click();
+        }
         return;
     }
 
-    ShowTimes();
-    document.getElementsByTagName("form")[0].append(New_Line);
-    document.getElementsByTagName("form")[0].append(OB_button);
-    document.getElementsByTagName("form")[0].append(ICQA_button);
-    document.getElementsByTagName("form")[0].append(IB_button);
-    document.getElementsByTagName("form")[0].append(SPEC_button);
-    document.getElementsByTagName("form")[0].append(BRK_button);
-    document.getElementsByTagName("form")[0].append(EOS_button);
 })();
