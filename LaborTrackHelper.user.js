@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Labor Track Helper
-// @namespace    https://aftlite-na.amazon.com/
-// @version      1.0
+// @namespace    https://github.com/whz1995/AftLite-NA/
+// @version      1.1
 // @description  Labor track users automaticlly every 5 minutes with set code, one-click labor tracking, show lastest labor track time.
-// @author       whz1995
+// @author       wuhongz@
 // @match        https://aftlite-na.amazon.com/indirect_action/signin_indirect_action*
 // @match        http://aftlite-na.amazon.com/indirect_action/signin_indirect_action*
-// @updateURL    https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.js
-// @updateURL    https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.js
+// @updateURL    https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.user.js
+// @downloadURL   https://github.com/whz1995/AftLite-NA/raw/main/LaborTrackHelper.user.js
 // @grant        none
 // ==/UserScript==
 
@@ -148,7 +148,7 @@
     function AutoLtAction(Action,Code){
         switch(Action){
             case "Start":
-                Auto_LT_Timer = setTimeout(function(){LaborTrack(Code,true)},3000);
+                Auto_LT_Timer = setTimeout(function(){LaborTrack(Code,true)},300000);
                 break;
             case "Stop":
                 clearTimeout(Auto_LT_Timer);
