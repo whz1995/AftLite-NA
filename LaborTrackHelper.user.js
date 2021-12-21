@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Labor Track Helper
 // @namespace    https://github.com/whz1995/AftLite-NA/
-// @version      1.1
+// @version      1.2
 // @description  Labor track users automaticlly every 5 minutes with set code, one-click labor tracking, show lastest labor track time.
 // @author       wuhongz@
 // @match        https://aftlite-na.amazon.com/indirect_action/signin_indirect_action*
@@ -165,7 +165,6 @@
             let New_Message = `${Labor_Track_Msg.innerText.replace(".","")} at ${Times}.`;
             Labor_Track_Msg.innerText = New_Message;
         }
-        return;
     }
 
     function LaborTrack(LT_button,isClick){
@@ -184,7 +183,6 @@
             const Submit_Button = document.getElementsByName("commit")[0];
             Submit_Button.click();
         }
-        return;
     }
 
 })();
