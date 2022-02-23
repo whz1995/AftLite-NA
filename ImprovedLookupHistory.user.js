@@ -162,7 +162,7 @@
 
         const obpsDiv =createElement("div",null,{margin:"auto",width:"125px"});
         lookupForm.after(obpsDiv);
-        const obpsButton = createElement("button");
+        const obpsButton = createElement("button",null,{borderRadius:"2px",borderWidth:"1px"});
         obpsDiv.append(obpsButton);
         obpsButton.addEventListener("click",clickObpsButton);
         initializeObpsButton();
