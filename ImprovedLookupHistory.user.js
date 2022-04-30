@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Improved Lookup History
 // @namespace    https://github.com/whz1995/AftLite-NA/
-// @version      0.9
+// @version      1.0
 // @description  Highlightes all the actions except PACK with different colors to provide better view of tracking units. Provides a button to hide all PACK action.Supports barcode/UPC tracking.
 // @author       wuhongz@
 // @match        https://aftlite-na.amazon.com/labor_tracking/lookup_history*
@@ -91,6 +91,7 @@
     function createElement(tag,attrs,styles){
         let newElement;
         if(tag === "svg" || tag === "g" || tag === "rect"){
+            //codes for future barcode generator support
         }
         else{
             newElement = document.createElement(tag);
@@ -171,6 +172,9 @@
     function createUpcCheck() {
         function getASIN(upc){
             const upcPage = new XMLHttpRequest();
+            upcPage.open("POST", "/inventory/view_catalog_data_for_asin");
+            upcPage.responseType = "document";
+            upcPage.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             upcPage.onloadend = function() {
                 let asin;
                 if(this.responseXML.getElementsByTagName("h2")[0].innerText.split(" ")[0] !== "No"){
@@ -181,10 +185,7 @@
                 }
                 document.getElementsByName("asin")[0].value = asin;
             }
-            upcPage.open("POST", "/inventory/view_catalog_data_for_asin");
-            upcPage.responseType = "document";
-            upcPage.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            upcPage.send("asin=upc");
+            upcPage.send("asin="+upc);
         }
 
         function createBarCodeForm(){
@@ -208,7 +209,7 @@
                     event.preventDefault();
                     getASIN(upcInput.value);
                     clearOtherFields("asin");
-                    submitButton.click();
+                    //submitButton.click();
                 }
             });
         }
@@ -221,14 +222,17 @@
             }
         }
 
-       function fixOtherFields(){
+        function fixOtherFields(){
             for(let i = 0; i < fieldsLength; i++){
-                fields[i].addEventListener('keydown', function(event){
-                if(event.key == "Enter"){
-                    event.preventDefault();
-                    clearOtherFields(fields[i].name);
+                if(fields[i].name !== "upc"){
+                    fields[i].addEventListener('keydown', function(event){
+                        if(event.key == "Enter"){
+                            event.preventDefault();
+                            clearOtherFields(fields[i].name);
+                            document.querySelector("input[type=submit]").click();
+                        }
+                    });
                 }
-            });
             }
         }
         createBarCodeForm();
