@@ -4,8 +4,9 @@
 // @version      1.2
 // @description  Add items images and items barcodes at inventory pages.
 // @description  Click Raw to install the script
-// @author       whz1995
+// @author       wuhongz@
 // @match        https://aftlite-na.amazon.com/inventory/view_inventory_at*
+// @match        http://aftlite-na.amazon.com/inventory/view_inventory_at*
 // @updateURL    https://gist.github.com/whz1995/3c04b7795317b7f5cbdab21b01ea0c49/raw/InventoryImageAndBarcode.user.js
 // @downloadURL  https://gist.github.com/whz1995/3c04b7795317b7f5cbdab21b01ea0c49/raw/InventoryImageAndBarcode.user.js
 // @grant        none
