@@ -3,8 +3,9 @@
 // @namespace    http://aftlite-na.amazon.com/
 // @version      1.3
 // @description  Add item ASIN barcode on item image pages. Get alternative item iamge from amazon server if the orginal image cannot be displayed.
-// @author       whz1995
+// @author       wuhongz@
 // @match        https://aftlite-na.amazon.com/inventory/view_catalog_data_for_asin*
+// @match        http://aftlite-na.amazon.com/inventory/view_catalog_data_for_asin*
 // @updateURL    https://gist.github.com/whz1995/b17d1e7c81e3d7d75f8ed1060479d47a/raw/ImagePageASINBarcode.user.js
 // @downloadURL  https://gist.github.com/whz1995/b17d1e7c81e3d7d75f8ed1060479d47a/raw/ImagePageASINBarcode.user.js
 // @grant        none
